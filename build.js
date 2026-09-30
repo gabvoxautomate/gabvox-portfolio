@@ -245,6 +245,10 @@ function solutionPage(solution) {
   const division = divisions[solution.division];
   const industry = industries.find((item) => item.slug === solution.industry);
   return `<main id="main">${pageHero(`${division.eyebrow} · ${industry.name.toUpperCase()}`, solution.title, solution.summary, [{ label: division.shortName, path: `/${solution.division === 'automation' ? 'automation' : solution.division === 'web' ? 'web-development' : 'automate-dev'}/` }, { label: industry.name, path: pathForIndustry(industry) }])}
+    ${solution.visual ? `<section class="section solution-visual-section"><div class="content-wrap"><figure class="solution-concept">
+      <img src="${escapeHtml(solution.visual.src)}" width="1365" height="768" alt="${escapeHtml(solution.visual.alt)}" loading="lazy" decoding="async">
+      <figcaption><p class="eyebrow">CONCEPTUAL WORKFLOW</p><h2>${escapeHtml(solution.visual.title)}</h2><p>${escapeHtml(solution.visual.caption)}</p></figcaption>
+    </figure></div></section>` : ''}
     <section class="section"><div class="content-wrap solution-detail">
       <aside class="solution-aside"><p class="eyebrow">THE BUSINESS CONTEXT</p><p>${escapeHtml(industry.problem)}</p>${link(pathForIndustry(industry), `More ${escapeHtml(industry.name.toLowerCase())} solutions ${icon('arrow')}`, 'text-link')}</aside>
       <div class="solution-content">${solution.sections.map(([title, copy], index) => `<article class="detail-step"><span>0${index + 1}</span><div><h2>${escapeHtml(title)}</h2><p>${escapeHtml(copy)}</p></div></article>`).join('')}</div>
@@ -301,6 +305,8 @@ function footer() {
 
 function renderDocument(page) {
   const canonical = `${siteUrl}${page.path}`;
+  const socialImage = page.socialImage ? `${siteUrl}${page.socialImage}` : `${siteUrl}/assets/logo/gabvox-logo.webp`;
+  const socialImageAlt = page.socialImageAlt || 'Gabvox Portfolio. Smart solutions, real results.';
   const breadcrumbs = page.path.split('/').filter(Boolean).map((segment, index, segments) => {
     const labels = {
       automation: 'Automation',
@@ -376,9 +382,10 @@ function renderDocument(page) {
   <meta property="og:title" content="${escapeHtml(page.title)}">
   <meta property="og:description" content="${escapeHtml(page.description)}">
   <meta property="og:url" content="${escapeHtml(canonical)}">
-  <meta property="og:image" content="${escapeHtml(`${siteUrl}/assets/logo/gabvox-logo.webp`)}">
-  <meta property="og:image:alt" content="Gabvox Portfolio. Smart solutions, real results.">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="${escapeHtml(socialImage)}">
+  <meta property="og:image:alt" content="${escapeHtml(socialImageAlt)}">
+  <meta name="twitter:card" content="${page.socialImage ? 'summary_large_image' : 'summary'}">
+  ${page.socialImage ? `<meta name="twitter:image" content="${escapeHtml(socialImage)}">\n  <meta name="twitter:image:alt" content="${escapeHtml(socialImageAlt)}">` : ''}
   <title>${escapeHtml(page.title)}</title>
   <link rel="canonical" href="${escapeHtml(canonical)}">
   <link rel="icon" href="/assets/logo/gabvox-icon.png" type="image/png">
@@ -407,7 +414,7 @@ function renderDocument(page) {
 function createPages() {
   const pages = [{
     path: '/',
-    title: 'Gabvox | Business Automation, Websites & Connected Systems',
+    title: 'Business Automation & Web Development | Gabvox',
     description: 'Choose a business solution. Explore workflow automation, conversion-focused websites, and connected digital systems designed around real business needs.',
     body: homePage(),
     includeSelectorData: true,
@@ -443,9 +450,13 @@ function createPages() {
   for (const solution of solutionPages) {
     pages.push({
       path: solution.path,
-      title: `${solution.title} | Gabvox`,
+      title: solution.seoTitle || `${solution.title} | Gabvox`,
       description: solution.summary,
       body: solutionPage(solution),
+      ...(solution.visual ? {
+        socialImage: solution.visual.src,
+        socialImageAlt: solution.visual.alt,
+      } : {}),
       schema: [{ '@context': 'https://schema.org', '@type': 'Service', name: solution.title, description: solution.summary, provider: { '@type': 'Organization', name: 'Gabvox', url: `${siteUrl}/` } }],
     });
   }
@@ -493,6 +504,12 @@ fs.mkdirSync(logoDirectory, { recursive: true });
 for (const asset of ['gabvox-logo.webp', 'gabvox-icon.png']) {
   fs.copyFileSync(path.join(__dirname, 'src', 'assets', 'logo', asset), path.join(logoDirectory, asset));
 }
+const solutionAssetDirectory = path.join(output, 'assets', 'solutions');
+fs.mkdirSync(solutionAssetDirectory, { recursive: true });
+fs.copyFileSync(
+  path.join(__dirname, 'src', 'assets', 'solutions', 'real-estate-lead-response.webp'),
+  path.join(solutionAssetDirectory, 'real-estate-lead-response.webp'),
+);
 
 const sitemapPages = createPages();
 fs.writeFileSync(path.join(output, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapPages.map((page) => `  <url><loc>${escapeHtml(`${siteUrl}${page.path}`)}</loc></url>`).join('\n')}\n</urlset>\n`, 'utf8');

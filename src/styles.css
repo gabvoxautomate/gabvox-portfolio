@@ -1233,6 +1233,49 @@ h3 {
   font-size: 14px;
 }
 
+.solution-visual-section {
+  padding-top: 44px;
+  padding-bottom: 0;
+}
+
+.solution-concept {
+  max-width: 1020px;
+  margin: 0 auto;
+}
+
+.solution-concept img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+.solution-concept figcaption {
+  max-width: 820px;
+  margin-top: 22px;
+}
+
+.solution-concept figcaption .eyebrow {
+  margin-bottom: 8px;
+}
+
+.solution-concept figcaption h2 {
+  margin-bottom: 10px;
+  font-family: var(--serif);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  line-height: 1.25;
+}
+
+.solution-concept figcaption > p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
 .solution-content {
   display: grid;
   gap: 29px;

@@ -259,7 +259,14 @@ const solutionPages = [
     division: 'automation',
     industry: 'real-estate',
     title: 'Real estate lead response automation',
-    summary: 'A considered enquiry workflow that helps property teams organise new leads and respond with less delay.',
+    seoTitle: 'Real Estate Lead Response Automation for Agents | Gabvox',
+    summary: 'Explore a real estate lead response automation concept for capturing property enquiries, routing leads to agents, and organising viewing follow-up.',
+    visual: {
+      src: '/assets/solutions/real-estate-lead-response.webp',
+      alt: 'Concept illustration comparing manual real estate lead handling with an automated enquiry, follow-up, and appointment dashboard.',
+      title: 'A clearer path from property enquiry to agent follow-up',
+      caption: 'This conceptual illustration shows how an enquiry might move from capture to agent follow-up and viewing coordination. The dashboard and figures are illustrative, not verified results; third-party logos in the supplied artwork do not indicate active integrations.',
+    },
     sections: [
       ['The business challenge', 'Property enquiries can arrive while agents are away from their desks. If details are scattered across inboxes, timely follow-up becomes harder.'],
       ['A solution concept', 'Capture the enquiry context, route it to the right agent, and make a next-step reminder visible to the team. Any connection to listing, CRM, or messaging platforms depends on technical feasibility and agreed scope.'],
