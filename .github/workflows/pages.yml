@@ -1,0 +1,83 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build static website
+        run: npm run build
+        env:
+          SITE_URL: https://gabvoxautomate.github.io/gabvox-portfolio
+
+      - name: Apply GitHub Pages project path to generated files
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const root = 'dist';
+          const basePath = '/gabvox-portfolio';
+          const textExtensions = new Set(['.html', '.js', '.css']);
+
+          function applyBasePath(directory) {
+            for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+              const filePath = path.join(directory, entry.name);
+              if (entry.isDirectory()) {
+                applyBasePath(filePath);
+                continue;
+              }
+
+              if (!textExtensions.has(path.extname(entry.name))) continue;
+
+              const content = fs.readFileSync(filePath, 'utf8');
+              const rewritten = content
+                .replace(/(["'])\/(?!\/)/g, `$1${basePath}/`)
+                .replace(/url\((['"]?)\/(?!\/)/g, `url($1${basePath}/`);
+              fs.writeFileSync(filePath, rewritten);
+            }
+          }
+
+          applyBasePath(root);
+          NODE
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
